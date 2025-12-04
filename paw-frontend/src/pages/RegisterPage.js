@@ -1,93 +1,113 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'framer-motion';
+import { FiUser, FiMail, FiLock, FiBriefcase, FiArrowRight } from 'react-icons/fi';
 
 export default function RegisterPage() {
-  const [nama, setNama] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('mahasiswa');
+  const [formData, setFormData] = useState({ nama: '', email: '', password: '', role: 'mahasiswa' });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiBackend = 'http://localhost:3001/api/auth/register';
-
+    setIsLoading(true);
     try {
-      const response = await axios.post(apiBackend, { nama, email, password, role });
-      console.log(response.data);
-      alert('Registrasi berhasil! Silakan login.');
+      await axios.post('http://localhost:3001/api/auth/register', formData);
+      alert('Registrasi Berhasil!');
       navigate('/login');
-
     } catch (error) {
-      console.error('Register Error:', error);
-      
-      // --- PERBAIKAN ERROR HANDLING DI SINI ---
-      let errorMessage = "Gagal menghubungi server. Pastikan backend sudah jalan!";
-      
-      if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      }
-      
-      alert(errorMessage);
+      alert(error.response?.data?.message || "Registrasi Gagal");
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
+      <div className="animated-bg"></div>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
 
-      <div className="max-w-md w-full space-y-8 relative z-10 bg-white p-8 rounded-xl shadow-2xl">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">Buat Akun Baru</h2>
-          <p className="mt-2 text-sm text-gray-600">Bergabung bersama tim kami</p>
+      <motion.div 
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative w-full max-w-lg bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl p-8 sm:p-10"
+      >
+         <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 mb-2">
+              Join Us
+            </h1>
+            <p className="text-gray-300">Mulai perjalanan karir Anda bersama kami.</p>
         </div>
-        
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 gap-4">
-            <input
-              type="text"
-              required
-              placeholder="Nama Lengkap"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-blue-500 focus:bg-white focus:ring-0"
-            />
-            <input
-              type="email"
-              required
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-blue-500 focus:bg-white focus:ring-0"
-            />
-            <input
-              type="password"
-              required
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-blue-500 focus:bg-white focus:ring-0"
-            />
-            <select 
-              value={role} 
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-blue-500 focus:bg-white focus:ring-0"
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+           {/* Nama */}
+           <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <FiUser className="text-gray-400 group-focus-within:text-purple-400" />
+              </div>
+              <input
+                type="text" required placeholder="Nama Lengkap"
+                className="w-full pl-12 pr-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                onChange={(e) => setFormData({...formData, nama: e.target.value})}
+              />
+           </div>
+
+           {/* Email */}
+           <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <FiMail className="text-gray-400 group-focus-within:text-purple-400" />
+              </div>
+              <input
+                type="email" required placeholder="Email Address"
+                className="w-full pl-12 pr-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
+           </div>
+
+           {/* Password */}
+           <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <FiLock className="text-gray-400 group-focus-within:text-purple-400" />
+              </div>
+              <input
+                type="password" required placeholder="Password"
+                className="w-full pl-12 pr-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
+           </div>
+
+           {/* Role */}
+           <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <FiBriefcase className="text-gray-400 group-focus-within:text-purple-400" />
+              </div>
+              <select 
+                className="w-full pl-12 pr-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-purple-400 focus:border-transparent appearance-none"
+                onChange={(e) => setFormData({...formData, role: e.target.value})}
+              >
+                <option value="mahasiswa" className="text-black">Staff / Mahasiswa</option>
+                <option value="admin" className="text-black">Administrator</option>
+              </select>
+           </div>
+
+           <motion.button
+              whileHover={{ scale: 1.02, backgroundImage: "linear-gradient(to right, #a855f7, #ec4899)" }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2 mt-6"
             >
-              <option value="mahasiswa">Mahasiswa</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-
-          <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-105 transition duration-200">
-            Daftar Sekarang
-          </button>
-
-          <p className="text-center text-sm text-gray-600">
-            Sudah punya akun? <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">Login</Link>
-          </p>
+              {isLoading ? 'Mendaftarkan...' : <><span>DAFTAR SEKARANG</span><FiArrowRight/></>}
+            </motion.button>
         </form>
-      </div>
+        
+        <div className="mt-6 text-center">
+            <Link to="/login" className="text-sm text-gray-400 hover:text-white transition">
+              Sudah punya akun? Login saja
+            </Link>
+        </div>
+      </motion.div>
     </div>
   );
 }
